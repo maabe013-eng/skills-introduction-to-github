@@ -1,47 +1,33 @@
-# Introduction to GitHub
+# JPSED 年次データの統計分析
 
-_Get started using GitHub in less than an hour._
+各年のJPSED（Japan Panel Study of Employment Dynamics）CSVファイルを読み込み、データ定義書（TXT）を参照しながら、列ごとの記述統計を作成するためのPythonツールです。個票データはこのリポジトリに含めず、ローカル環境で分析してください。
 
-## Welcome
+## 使い方
 
-People use GitHub to build some of the most advanced technologies in the world. Whether you’re visualizing data or building a new game, there’s a whole community and set of tools on GitHub that can help you do it even better. GitHub Skills’ “Introduction to GitHub” exercise guides you through everything you need to start contributing in less than an hour.
+Python 3.9以降を用意し、年次CSVを `data/` に、データ定義書を任意の場所に置きます。追加パッケージは不要です。
 
-- **Who is this for**: New developers, new GitHub users, and students.
-- **What you'll learn**: We'll introduce repositories, branches, commits, and pull requests.
-- **What you'll build**: We'll make a short Markdown file you can use as your [profile README](https://docs.github.com/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/managing-your-profile-readme).
-- **Prerequisites**: None. This exercise is a great introduction for your first day on GitHub.
-- **How long**: This exercise takes less than one hour to complete.
+```text
+data/
+  jpsed_2020.csv
+  jpsed_2021.csv
+```
 
-In this exercise, you will:
+```bash
+python analyze_jpsed.py --data-dir data --dictionary path/to/data_definition.txt > report.md
+```
 
-1. Create a branch
-2. Commit a file
-3. Open a pull request
-4. Merge your pull request
+スクリプトは `data/` 直下のCSVファイルを年ごとに集計し、レポート末尾にデータ定義書の原文を添付します。UTF-8（BOM付き含む）とCP932のファイルを読み込めます。
 
-### How to start this exercise
+データ定義書でカテゴリ変数と確認した列は、数値コードの列もカテゴリ別件数として集計するよう指定できます。
 
-Simply copy the exercise to your account, then give your favorite Octocat (Mona) **about 20 seconds** to prepare the first lesson, then **refresh the page**.
+```bash
+python analyze_jpsed.py --data-dir data --dictionary path/to/data_definition.txt --categorical-columns employment_status sex > report.md
+```
 
-[![](https://img.shields.io/badge/Copy%20Exercise-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](https://github.com/new?template_owner=skills&template_name=introduction-to-github&owner=%40me&name=skills-introduction-to-github&description=Exercise:+Introduction+to+GitHub&visibility=public)
+数値として解釈できる列は、有効な数値の件数・平均・中央値・最小値・最大値を出力します。それ以外の列および `--categorical-columns` で指定した列は、上位10カテゴリの件数を出力します。空欄は欠損値として数えます。変数の意味や値コードを解釈するときは、レポートに添付されたデータ定義書と照合してください。これは記述統計の出発点であり、調査設計や重み付けを考慮した推測統計を行う場合は、データ定義書および調査資料に従って別途分析してください。
 
-<details>
-<summary>Having trouble? 🤷</summary><br/>
+## テスト
 
-When copying the exercise, we recommend the following settings:
-
-- For owner, choose your personal account or an organization to host the repository.
-
-- We recommend creating a public repository, since private repositories will use Actions minutes.
-
-If the exercise isn't ready in 20 seconds, please check the [Actions](../../actions) tab.
-
-- Check to see if a job is running. Sometimes it simply takes a bit longer.
-
-- If the page shows a failed job, please submit an issue. Nice, you found a bug! 🐛
-
-</details>
-
----
-
-&copy; 2026 GitHub &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [MIT License](https://gh.io/mit)
+```bash
+python -m unittest discover -s tests
+```
